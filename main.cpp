@@ -181,6 +181,22 @@ public:
 
     }
 
+    std::istream& operator >> (std::istream &in, Matrix &matrix){
+        for (int i = 0; i < dimx; i++)
+            for (int j = 0; j < dimy; j++){
+                in >> matrix.m[i][j];
+            }
+    }
+
+    std::ostream& operator << (std::ostream &out, const Matrix &matrix){
+        for (int i = 0; i < dimx; i++) {
+            for (int j = 0; j < dimy; j++) {
+                out << matrix.m[i][j] << " ";
+            }
+         out << std::endl;
+        }
+    }
+
     void PrintMatrixInFile(std::ofstream& f){
         f << dimx << " " << dimy;
 
