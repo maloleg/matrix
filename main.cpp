@@ -4,8 +4,33 @@
 #include "assert.h"
 using std::vector;
 
+template <typename T>
+class Matrix;
 
-template <class T>
+template <typename T>
+std::istream& operator>> (std::istream &in, Matrix<T> &matrix){
+    for (int i = 0; i < matrix.dimx; i++)
+        for (int j = 0; j < matrix.dimy; j++){
+            in >> matrix.m[i][j];
+        }
+
+    return in;
+}
+
+template <typename T>
+std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
+    for (int i = 0; i < matrix.dimx; i++) {
+        for (int j = 0; j < matrix.dimy; j++) {
+            out << matrix.m[i][j] << " ";
+        }
+        out << std::endl;
+    }
+
+    return out;
+}
+
+
+template <typename T>
 class Matrix{
 public:
     vector<vector<T>> m;
@@ -181,21 +206,9 @@ public:
 
     }
 
-    std::istream& operator >> (std::istream &in, Matrix &matrix){
-        for (int i = 0; i < dimx; i++)
-            for (int j = 0; j < dimy; j++){
-                in >> matrix.m[i][j];
-            }
-    }
+    friend std::istream& operator >><T>(std::istream &in, Matrix &matrix);
 
-    std::ostream& operator << (std::ostream &out, const Matrix &matrix){
-        for (int i = 0; i < dimx; i++) {
-            for (int j = 0; j < dimy; j++) {
-                out << matrix.m[i][j] << " ";
-            }
-         out << std::endl;
-        }
-    }
+    friend std::ostream& operator <<<T>(std::ostream &out, const Matrix &matrix);
 
     void PrintMatrixInFile(std::ofstream& f){
         f << dimx << " " << dimy;
@@ -256,6 +269,7 @@ public:
     }
 };
 
+
 int main() {
     Matrix<double> mat1(3, 3);
 
@@ -265,13 +279,15 @@ int main() {
 
    // mat1.SetMatrixSize();
 
-    for (int i = 0; i < mat1.dimx; i++)
+    /*for (int i = 0; i < mat1.dimx; i++)
         for (int j = 0; j < mat1.dimy; j++){
      //       std::cout << mat1.dimx << " " << mat1.dimy << std::endl;
 
             std::cin >> x;
             mat1.PutElement(i, j, x);
-        }
+        */
+
+    std::cin >> mat1;
 
     //mat1.StairCase();
 
@@ -286,6 +302,8 @@ int main() {
     mat1.PrintMatrix();
 
     std::cout << "Determinant = " << mat1.det();
+
+    std::cout << mat1;
 
 
 
