@@ -29,6 +29,27 @@ std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
     return out;
 }
 
+template <typename T>
+Matrix<T>& operator+ (Matrix<T> &lhs, const Matrix<T> &rhs){
+    assert(lhs.dimx == rhs.dimx);
+    assert(lhs.dimy == rhs.dimy);
+
+    for (int i = 0; i < lhs.dimx; i++)
+        for (int j = 0; j <lhs.dimy; j++){
+            lhs.m[i][j]+=rhs.m[i][j];
+        }
+    return lhs;
+}
+
+template <typename T>
+Matrix<T>& operator* (Matrix<T> &lhs, const T &rhs){
+    for (int i = 0; i < lhs.dimx; i++)
+        for (int j = 0; j <lhs.dimy; j++){
+            lhs.m[i][j]*=rhs;
+        }
+    return lhs;
+}
+
 
 template <typename T>
 class Matrix{
@@ -210,6 +231,11 @@ public:
 
     friend std::ostream& operator <<<T>(std::ostream &out, const Matrix &matrix);
 
+    friend Matrix<T>& operator +<T>( Matrix &lhs, const Matrix &rhs);
+
+    friend Matrix<T>& operator *<T>( Matrix &lhs, const T &rhs);
+
+
     void PrintMatrixInFile(std::ofstream& f){
         f << dimx << " " << dimy;
 
@@ -272,6 +298,7 @@ public:
 
 int main() {
     Matrix<double> mat1(3, 3);
+    Matrix<double> mat2(3, 3);
 
     double x = 0;
 
@@ -301,7 +328,9 @@ int main() {
 
     mat1.PrintMatrix();
 
-    std::cout << "Determinant = " << mat1.det();
+    //std::cout << "Determinant = " << mat1.det();
+
+    mat1 = mat1 * 5.;
 
     std::cout << mat1;
 
