@@ -154,8 +154,20 @@ public:
 
     void RowEchelonForm(){
             T temp = 0;
+
+
+
             for (int i = 0; i < dimx; i++) {
+                for (int j = i; j < dimy; j++)
+                    if (m[j][i] != 0) {
+                        std::swap(m[i], m[j]);
+                        break;
+                    }
+
                 temp = m[i][i];
+
+                this->PrintMatrix();
+
                 for (int j = 0; j < dimy; j++) {
                     if (i < dimy && temp != 0) m[i][j] /= temp;
                 }
@@ -184,7 +196,14 @@ public:
     void RowReducedEchelonForm(){
         T temp = 0;
         for (int i = 0; i < dimx; i++) {
+            for (int j = i; j < dimy; j++)
+                if (m[j][i] != 0) {
+                    std::swap(m[i], m[j]);
+                    break;
+                }
+
             temp = m[i][i];
+
             for (int j = 0; j < dimy; j++) {
                 if (i < dimy && temp != 0) m[i][j] /= temp;
             }
@@ -236,6 +255,8 @@ public:
     friend Matrix<T>& operator *<T>( Matrix &lhs, const T &rhs);
 
 
+
+
     void PrintMatrixInFile(std::ofstream& f){
         f << dimx << " " << dimy;
 
@@ -254,6 +275,14 @@ public:
 
         T temp = 0;
         for (int i = 0; i < dimx; i++) {
+
+            for (int j = i; j < dimy; j++)
+                if (m[j][i] != 0) {
+                    std::swap(m[i], m[j]);
+                    det *= -1;
+                    break;
+                }
+
             temp = m[i][i];
 
             if (temp != 0) det *= temp;
@@ -278,6 +307,8 @@ public:
             this->PrintMatrix(); std::cout << std::endl;
 
         }
+
+     for (int i = 0; i < dimx; i++) det*=m[i][i];
 
      return det;
 
@@ -318,7 +349,7 @@ int main() {
 
     //mat1.StairCase();
 
-    mat1.PrintMatrix();
+   // mat1.PrintMatrix();
 
   //  mat1.Transpose();
 
@@ -326,11 +357,11 @@ int main() {
 
     //mat1.RowReducedEchelonForm();
 
-    mat1.PrintMatrix();
+    //mat1.PrintMatrix();
 
-    //std::cout << "Determinant = " << mat1.det();
+    std::cout << "Determinant = " << mat1.det();
 
-    mat1 = mat1 * 5.;
+    //mat1 = mat1 * 5.;
 
     std::cout << mat1;
 
