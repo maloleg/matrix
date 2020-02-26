@@ -9,16 +9,21 @@ class Matrix;
 
 template <typename T>
 std::istream& operator>> (std::istream &in, Matrix<T> &matrix){
+    in >> matrix.dimx >> matrix.dimy;
+
+    matrix.SetMatrixSize();
+
     for (int i = 0; i < matrix.dimx; i++)
         for (int j = 0; j < matrix.dimy; j++){
             in >> matrix.m[i][j];
         }
-
     return in;
 }
 
 template <typename T>
 std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
+    out << matrix.dimx << " " << matrix.dimy << std::endl;
+
     for (int i = 0; i < matrix.dimx; i++) {
         for (int j = 0; j < matrix.dimy; j++) {
             out << matrix.m[i][j] << " ";
@@ -34,6 +39,7 @@ Matrix<T>& operator+ (Matrix<T> &lhs, const Matrix<T> &rhs){
     assert(lhs.dimx == rhs.dimx);
     assert(lhs.dimy == rhs.dimy);
 
+
     for (int i = 0; i < lhs.dimx; i++)
         for (int j = 0; j <lhs.dimy; j++){
             lhs.m[i][j]+=rhs.m[i][j];
@@ -48,6 +54,24 @@ Matrix<T>& operator* (Matrix<T> &lhs, const T &rhs){
             lhs.m[i][j]*=rhs;
         }
     return lhs;
+}
+
+template <typename T>
+const Matrix<T>& operator* (const Matrix<T> &lhs, const Matrix<T> &rhs){
+
+  //  std::cout << lhs.dimx << " " << rhs.dimy;
+
+    Matrix<T>* mnew = new Matrix<T>(lhs.dimx, rhs.dimy);
+
+            assert(lhs.dimx == rhs.dimy);
+//    *mnew(lhs.dimx, rhs.dimy);
+    for (int i = 0; i < lhs.dimx; i++)
+        for (int j = 0; j < rhs.dimy; j++){
+            for (int k = 0; k < lhs.dimx; k++){
+                 mnew->m[i][j] += lhs.m[k][i]*rhs.m[j][k];
+            }
+        }
+    return *mnew;
 }
 
 
@@ -254,6 +278,10 @@ public:
 
     friend Matrix<T>& operator *<T>( Matrix &lhs, const T &rhs);
 
+    friend Matrix<T>& operator +<T>( Matrix &lhs, const Matrix &rhs);
+
+    friend const Matrix<T>& operator *<T>(const Matrix &lhs, const Matrix &rhs);
+
 
 
 
@@ -314,9 +342,66 @@ public:
 
     }
 
+
+
+    void inverse(){
+        vector<vector<T>> mnew;
+
+        assert(this->det()!=0);
+
+        mnew.resize(m.size());
+        for (int i = 0; i < dimy; i++){
+            mnew[i].resize(m[i].size());
+            mnew[i][i] = 1;
+        }
+
+        T temp = 0;
+        for (int i = 0; i < dimx; i++) {
+            for (int j = i; j < dimy; j++)
+                if (m[j][i] != 0) {
+                    std::swap(m[i], m[j]);
+                    std::swap(mnew[i], mnew[j]);
+                    break;
+                }
+
+            temp = m[i][i];
+
+            for (int j = 0; j < dimy; j++) {
+                if (i < dimy && temp != 0) {
+                    m[i][j] /= temp;
+                    mnew[i][j] /= temp;
+                }
+
+
+                }
+
+            this->PrintMatrix();
+
+            for (int j = 0; j < dimx; j++) {
+                temp = m[j][i];
+                for (int k = 0; k < dimy; k++) {
+
+
+                    // std::cout << "-- " << j << " " << k <<  " m=" << m[j][k] << " temp=" << temp << std::endl;
+
+                    if (j != i){
+                        m[j][k] -= m[i][k] * temp;
+                        mnew[j][k] -= mnew[i][k] * temp;
+
+                    }
+
+                }
+
+            }
+            this->PrintMatrix(); std::cout << std::endl;
+
+
+        }
+
+     m = mnew;
+    }
+
     void SetMatrixSize(){
-        std::cin >> dimx;
-        std::cin >> dimy;
 
         m.resize(dimx);
 
@@ -328,12 +413,13 @@ public:
 
 
 int main() {
-    Matrix<double> mat1(3, 3);
-    Matrix<double> mat2(3, 3);
+    Matrix<double> mat1;
+    Matrix<double> mat2;
+    Matrix<double> mat3;
 
     double x = 0;
 
-    std::cout << mat1.dimx << " " << mat1.dimy << std::endl;
+//    std::cout << mat1.dimx << " " << mat1.dimy << std::endl;
 
    // mat1.SetMatrixSize();
 
@@ -347,6 +433,8 @@ int main() {
 
     std::cin >> mat1;
 
+    std::cin >> mat2;
+
     //mat1.StairCase();
 
    // mat1.PrintMatrix();
@@ -359,11 +447,15 @@ int main() {
 
     //mat1.PrintMatrix();
 
-    std::cout << "Determinant = " << mat1.det();
+    //std::cout << "Determinant = " << mat1.det();
+
+    //mat1.inverse();
 
     //mat1 = mat1 * 5.;
 
-    std::cout << mat1;
+  //  mat1=mat2*mat3;
+
+   std::cout << mat1*mat2;
 
 
 
