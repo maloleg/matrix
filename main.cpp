@@ -22,8 +22,6 @@ std::istream& operator>> (std::istream &in, Matrix<T> &matrix){
 
 template <typename T>
 std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
-    out << matrix.dimx << " " << matrix.dimy << std::endl;
-
     for (int i = 0; i < matrix.dimx; i++) {
         for (int j = 0; j < matrix.dimy; j++) {
             out << matrix.m[i][j] << " ";
@@ -36,9 +34,11 @@ std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
 
 template <typename T>
 Matrix<T>& operator+ (Matrix<T> &lhs, const Matrix<T> &rhs){
+
+    if (lhs.dimx != rhs.dimx || lhs.dimy != rhs.dimy) throw "Additition of two matrix with different sizes";
+
     assert(lhs.dimx == rhs.dimx);
     assert(lhs.dimy == rhs.dimy);
-
 
     for (int i = 0; i < lhs.dimx; i++)
         for (int j = 0; j <lhs.dimy; j++){
@@ -57,18 +57,28 @@ Matrix<T>& operator* (Matrix<T> &lhs, const T &rhs){
 }
 
 template <typename T>
+Matrix<T>& operator* (const T &rhs, Matrix<T> &lhs){
+    for (int i = 0; i < lhs.dimx; i++)
+        for (int j = 0; j <lhs.dimy; j++){
+            lhs.m[i][j]*=rhs;
+        }
+    return lhs;
+}
+
+template <typename T>
 const Matrix<T>& operator* (const Matrix<T> &lhs, const Matrix<T> &rhs){
 
   //  std::cout << lhs.dimx << " " << rhs.dimy;
 
     Matrix<T>* mnew = new Matrix<T>(lhs.dimx, rhs.dimy);
 
-            assert(lhs.dimx == rhs.dimy);
+    if (lhs.dimx != rhs.dimy) throw "Multiplication of unsutable matrixes";
+    assert(lhs.dimx == rhs.dimy);
 //    *mnew(lhs.dimx, rhs.dimy);
     for (int i = 0; i < lhs.dimx; i++)
         for (int j = 0; j < rhs.dimy; j++){
-            for (int k = 0; k < lhs.dimx; k++){
-                 mnew->m[i][j] += lhs.m[k][i]*rhs.m[j][k];
+            for (int k = 0; k < rhs.dimx; k++){
+                 mnew->m[j][i] += rhs.m[k][i]*lhs.m[j][k];
             }
         }
     return *mnew;
@@ -77,14 +87,16 @@ const Matrix<T>& operator* (const Matrix<T> &lhs, const Matrix<T> &rhs){
 
 template <typename T>
 class Matrix{
-public:
+private:
     vector<vector<T>> m;
+    vector<vector<T>> mTemp;
     size_t dimx, dimy;
     T temp;
 
+public:
     Matrix<T>(size_t rows = 0, size_t cols = 0) {
-        dimx = rows;
-        dimy = cols;
+        dimx = cols;
+        dimy = rows;
 
         m.resize(dimx);
 
@@ -190,13 +202,13 @@ public:
 
                 temp = m[i][i];
 
-                this->PrintMatrix();
+//                this->PrintMatrix();
 
                 for (int j = 0; j < dimy; j++) {
                     if (i < dimy && temp != 0) m[i][j] /= temp;
                 }
 
-                this->PrintMatrix();
+//                this->PrintMatrix();
 
                 for (int j = 0; j < dimx; j++) {
                     temp = m[j][i];
@@ -210,7 +222,7 @@ public:
                     }
 
                 }
-                this->PrintMatrix(); std::cout << std::endl;
+//                this->PrintMatrix(); std::cout << std::endl;
 
             }
     //    }
@@ -232,7 +244,7 @@ public:
                 if (i < dimy && temp != 0) m[i][j] /= temp;
             }
 
-            this->PrintMatrix();
+//            this->PrintMatrix();
 
             for (int j = 0; j < dimx; j++) {
                 temp = m[j][i];
@@ -246,7 +258,7 @@ public:
                 }
 
             }
-            this->PrintMatrix(); std::cout << std::endl;
+//            this->PrintMatrix(); std::cout << std::endl;
 
         }
         //    }
@@ -278,6 +290,8 @@ public:
 
     friend Matrix<T>& operator *<T>( Matrix &lhs, const T &rhs);
 
+    friend Matrix<T>& operator *<T>( const T &rhs, Matrix &lhs);
+
     friend Matrix<T>& operator +<T>( Matrix &lhs, const Matrix &rhs);
 
     friend const Matrix<T>& operator *<T>(const Matrix &lhs, const Matrix &rhs);
@@ -297,7 +311,11 @@ public:
     }
 
     T det (){
-        assert(dimx == dimy);
+        //assert(dimx == dimy);
+
+        if (dimx != dimy) throw "Non Square matrix! Can not compute the determinant.";
+
+        mTemp = m;
 
         T det = 1;
 
@@ -318,7 +336,7 @@ public:
                 if (i < dimy && temp != 0){ m[i][j] /= temp;}
             }
 
-            this->PrintMatrix();
+//            this->PrintMatrix();
 
             for (int j = 0; j < dimx; j++) {
                 temp = m[j][i];
@@ -332,11 +350,15 @@ public:
                 }
 
             }
-            this->PrintMatrix(); std::cout << std::endl;
+//            this->PrintMatrix(); std::cout << std::endl;
 
         }
 
      for (int i = 0; i < dimx; i++) det*=m[i][i];
+
+     m = mTemp;
+
+     mTemp.clear();
 
      return det;
 
@@ -347,7 +369,9 @@ public:
     void inverse(){
         vector<vector<T>> mnew;
 
-        assert(this->det()!=0);
+
+        if (this->det() == 0) throw "Cannot Inverse Matrix wirh Determinant = 0";
+       // assert(this->det()!=0);
 
         mnew.resize(m.size());
         for (int i = 0; i < dimy; i++){
@@ -375,7 +399,7 @@ public:
 
                 }
 
-            this->PrintMatrix();
+//            this->PrintMatrix();
 
             for (int j = 0; j < dimx; j++) {
                 temp = m[j][i];
@@ -393,7 +417,7 @@ public:
                 }
 
             }
-            this->PrintMatrix(); std::cout << std::endl;
+//            this->PrintMatrix(); std::cout << std::endl;
 
 
         }
@@ -407,15 +431,58 @@ public:
 
         for (int i = 0; i < dimx; i++) m[i].resize(dimy);
 
-        std::cout << "dimx = " << dimx << "  dimy = " << dimy << std::endl;
+//        std::cout << "dimx = " << dimx << "  dimy = " << dimy << std::endl;
     }
 };
 
+void Task1(){
+    double k;
+    Matrix<double> A;
+    Matrix<double> B;
+    Matrix<double> C;
+
+    std::cin >> k >> A >> B >> C;
+
+    try{
+        B.transpose();
+        C.inverse();
+
+        A = A + k*B*C;
+
+        std::cout << 1 << std::endl << A.det() << std::endl << A;
+    }
+    catch (const char* msg){
+        std::cout << -1 << std::endl << msg;
+    }
+
+
+}
+
+void Task2(){
+    Matrix<double> A;
+
+    std::cin >> A;
+
+
+    try{
+        A.RowEchelonForm();
+        std::cout << A;
+    }
+
+    catch (const char* msg){
+        std::cout << -1 << std::endl << msg;
+    }
+
+
+
+}
+
+
 
 int main() {
-    Matrix<double> mat1;
-    Matrix<double> mat2;
-    Matrix<double> mat3;
+//    Matrix<double> mat1;
+//    Matrix<double> mat2;
+//    Matrix<double> mat3;
 
     double x = 0;
 
@@ -431,19 +498,20 @@ int main() {
             mat1.PutElement(i, j, x);
         */
 
-    std::cin >> mat1;
+   // std::cin >> mat1;
 
-    std::cin >> mat2;
+    //std::cin >> mat2;
 
     //mat1.StairCase();
 
    // mat1.PrintMatrix();
 
-  //  mat1.Transpose();
+   // mat1.transpose();
+  //  mat1.transpose();
 
   //  mat1.PrintMatrix();
 
-    //mat1.RowReducedEchelonForm();
+   // mat1.RowEchelonForm();
 
     //mat1.PrintMatrix();
 
@@ -455,7 +523,11 @@ int main() {
 
   //  mat1=mat2*mat3;
 
-   std::cout << mat1*mat2;
+ //  std::cout << "mat1 =" << std::endl << mat1 << std::endl << "mat2 = " << mat2 << std::endl;
+
+   //std::cout << 3.*mat1*5.;
+
+    Task2();
 
 
 
