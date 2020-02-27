@@ -90,10 +90,11 @@ class Matrix{
 private:
     vector<vector<T>> m;
     vector<vector<T>> mTemp;
-    size_t dimx, dimy;
     T temp;
 
 public:
+    size_t dimx, dimy;
+
     Matrix<T>(size_t rows = 0, size_t cols = 0) {
         dimx = cols;
         dimy = rows;
@@ -265,6 +266,22 @@ public:
         //else std::cout << "Not square matrix" << dimx << "x" << dimy << std::endl;
     }
 
+    void DeleteZeroRows(){
+        temp = 0;
+
+        for (int i = 0; i < dimx; i++){
+            for (int j = 0; j < dimy; j++){
+                temp+=abs(m[i][j]);
+            }
+         if (temp == 0){
+             m.erase(m.begin() + i);
+             dimx--;
+             i--;
+         }
+         temp = 0;
+        }
+    }
+
     void GetMatrixFromFile(std::ifstream& f){
         int x, y;
         T a;
@@ -360,7 +377,7 @@ public:
 
      mTemp.clear();
 
-     return det;
+     return -det;
 
     }
 
@@ -433,6 +450,14 @@ public:
 
 //        std::cout << "dimx = " << dimx << "  dimy = " << dimy << std::endl;
     }
+
+    void ZeroesToPlus(){
+        for (int i = 0; i < dimx; i++){
+            for (int j = 0; j < dimy; j++){
+                if (m[i][j] == 0) m[i][j] = abs(m[i][j]);
+            }
+        }
+    }
 };
 
 void Task1(){
@@ -463,16 +488,49 @@ void Task2(){
 
     std::cin >> A;
 
+    int dimxAtStart = A.dimx;
+
+    double temp = 0;
+
 
     try{
-        A.RowEchelonForm();
-        std::cout << A;
+        A.RowReducedEchelonForm();
+        A.ZeroesToPlus();
+        A.DeleteZeroRows();
+
+        if (A.dimx == A.dimy && A.det() == 1) std::cout << 0 << " " << A.dimx;
+        else{
+
+            std::cout << dimxAtStart-A.dimx << " " << A.dimy << std::endl;
+
+      //      std::cout << dimxAtStart << " " << A.dimx << " " << A.dimy << std::endl;
+
+            for (int i = 0; i <dimxAtStart - A.dimx; i++){
+                temp = 0;
+                for (int j = 0; j < A.dimy; j++){
+                    if (temp == 0 || A.GetElement(i, j) == 0) std::cout << A.GetElement(i, j) << " ";
+                    else std::cout << -1*A.GetElement(i, j) << " ";
+
+                    if (A.GetElement(i, j) == 1) temp = 1;
+                }
+                std::cout << std::endl;
+            }
+   //      std::cout << A;
+
+        }
+
     }
 
     catch (const char* msg){
         std::cout << -1 << std::endl << msg;
     }
+}
 
+void Task3(){
+    Matrix<double> A;
+
+
+    std::cin >> A;
 
 
 }
