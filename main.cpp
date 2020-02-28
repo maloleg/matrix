@@ -11,7 +11,7 @@ template <typename T>
 std::istream& operator>> (std::istream &in, Matrix<T> &matrix){
     in >> matrix.dimx >> matrix.dimy;
 
-    matrix.SetMatrixSize();
+    matrix.SetMatrixSize(0, 0);
 
     for (int i = 0; i < matrix.dimx; i++)
         for (int j = 0; j < matrix.dimy; j++){
@@ -127,14 +127,21 @@ public:
     }
 
     void PutElement (int x, int y, T a){
-        if (m.size() < x) m.resize(x);
+        if (m.size() < x) m.resize(dimx);
 
         if (m[0].size() < y)
             for (int i = 0; i < y; i++){
-                m[i].resize(y);
+                m[i].resize(dimy);
             }
-
         m[x][y] = a;
+    }
+
+    void MatrixResize(int x, int y){
+        m.size(dimx);
+
+        for (int i = 0; i < dimx; i++){
+            m[i].resize(dimy);
+        }
     }
 
     void MultiplyByNumber(T x){
@@ -442,7 +449,7 @@ public:
      m = mnew;
     }
 
-    void SetMatrixSize(){
+    void SetMatrixSize(size_t i, size_t i1) {
 
         m.resize(dimx);
 
@@ -528,11 +535,88 @@ void Task2(){
 
 void Task3(){
     Matrix<double> A;
-
+    double x = 0;
+    double temp, check = 0;
 
     std::cin >> A;
 
+    int dimxAtStart = A.dimx;
 
+    A.dimy += 1;
+
+    A.SetMatrixSize(A.dimx, A.dimy);
+
+    for (int i = 0; i < A.dimx; i++){
+        std::cin >> x;
+        A.PutElement(i, A.dimy-1, x);
+        //std::cout << B.GetElement(0, i);
+    }
+
+
+
+    try {
+
+      //  std::cout << A << std::endl;
+
+
+        A.DeleteZeroRows();
+
+
+        //std::cout << A;
+        //std::cout << A;
+
+        for (int i = 0; i < A.dimx; i++){
+            temp = 0;
+            for (int j = 0; j < A.dimy; j++){
+                temp += A.GetElement(i, j);
+            }
+            if (temp == A.GetElement(i, A.dimy-1)) check = 1;
+        }
+
+        if (check == 1) {
+            std::cout << -1;
+        }
+        else {
+            A.RowReducedEchelonForm();
+            std::cout << A.dimy - 1 << " " << dimxAtStart - A.dimx << std::endl;
+
+            for (int i = 0; i < A.dimx; i++){
+                for (int j = i; j < A.dimy-1; j++){
+                    temp = 0;
+
+                    if (A.GetElement(i, j) != 0){
+                        for (int k =j+1; k < A.dimy-1; k++) {temp += A.GetElement(i, k);}
+                        std::cout << A.GetElement(i, A.dimy-1)-temp << " ";
+                        break;
+                    }
+                    else std::cout << 1 << " ";
+                }
+            }
+
+            for (int i = 0; i <dimxAtStart - A.dimx; i++) std::cout << "1 ";
+            std::cout << std::endl;
+
+            for (int i = dimxAtStart - A.dimx; i > 0; i--){
+                temp = 0;
+                for (int j = 0; j < A.dimy-1; j++){
+                    if (temp == 0 || A.GetElement(i, j) == 0) std::cout << A.GetElement(i, j) << " ";
+                    else std::cout << -1*A.GetElement(i, j) << " ";
+
+                    if (A.GetElement(i, j) == 1) temp = 1;
+                }
+                std::cout << std::endl;
+            }
+        }
+
+
+
+
+        }
+        //std::cout << A << std::endl;
+
+    catch (const char* msg){
+        std::cout << -1 << std::endl << msg;
+    }
 }
 
 
@@ -588,6 +672,13 @@ int main() {
     Task2();
 
 
-
-    return 0;
+//    Matrix<double> m;
+//
+//    std::cin >> m;
+//
+//    m.RowReducedEchelonForm();
+//
+//    std::cout << m;
+//
+//    return 0;
 }
