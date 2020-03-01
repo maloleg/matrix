@@ -1,6 +1,12 @@
 #include "Matrix.hpp"
 
 int main(){
+    std::ifstream f1;
+    std::ofstream f2;
+
+    f1.open("in.txt");
+    f2.open("out.txt");
+
     Matrix<double> A;
     double x = 0;
     double temp, check = 0;
@@ -13,7 +19,7 @@ int main(){
     abc.clear();
     abc2.clear();
 
-    std::cin >> A;
+    f1 >> A;
 
     int dimxAtStart = A.dimx;
 
@@ -22,7 +28,8 @@ int main(){
     A.SetMatrixSize(A.dimx, A.dimy);
 
     for (int i = 0; i < A.dimx; i++){
-        std::cin >> x;
+        f1 >> x;
+        f1 >> x;
         A.PutElement(i, A.dimy-1, x);
         //std::cout << B.GetElement(0, i);
     }
@@ -39,11 +46,11 @@ int main(){
         }
 
         if (check == 1) {
-            std::cout << -1;
+            f2 << -1;
         }
         else {
             A.RowReducedEchelonForm();
-            std::cout << A.dimy - 1 << " " << dimxAtStart - A.dimx << std::endl;
+            f2 << A.dimy - 1 << " " << dimxAtStart - A.dimx << std::endl;
 
             for (int i = 0; i < A.dimx; i++){
                 for (int j = i; j < A.dimy-1; j++){
@@ -51,10 +58,10 @@ int main(){
 
                     if (A.GetElement(i, j) != 0){
                         for (int k =j+1; k < A.dimy-1; k++) {temp += A.GetElement(i, k);}
-                        std::cout << A.GetElement(i, A.dimy-1)-temp << " ";
+                        f2 << A.GetElement(i, A.dimy-1)-temp << " ";
                         break;
                     }
-                    else std::cout << 1 << " ";
+                    else f2 << 1 << " ";
                 }
             }
 
@@ -66,8 +73,8 @@ int main(){
             A.DeleteZeroRows();
             A.transpose();
 
-            for (int i = 0; i <dimxAtStart - A.dimx; i++) std::cout << "1 ";
-            std::cout << std::endl;
+            for (int i = 0; i <dimxAtStart - A.dimx; i++) f2 << "1 ";
+            f2 << std::endl;
 
             for (int i = 0; i < A.dimx; i++) {
                 j = 0;
@@ -101,20 +108,23 @@ int main(){
 
 
                     if (temp == 1){
-                        std::cout << -A.GetElement(k, abc[i]) + 0 << " ";
+                        f2 << -A.GetElement(k, abc[i]) + 0 << " ";
                     }
                     else{
-                        if (abc[i] == k) std::cout << "1 ";
-                        else std::cout << "0 ";
+                        if (abc[i] == k) f2 << "1 ";
+                        else f2 << "0 ";
                     }
 
                 }
-                std::cout << std::endl;
+                f2 << std::endl;
             }
         }
 
         }
     catch (const char* msg){
-        std::cout << -1 << std::endl << msg;
+        f2 << -1 << std::endl << msg;
     }
+
+    f1.close();
+    f2.close();
 }

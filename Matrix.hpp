@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <deque>
-#include "fstream"
+#include <fstream>
 #include "assert.h"
 using std::vector;
 using std::deque;
@@ -30,7 +30,7 @@ template <typename T>
 std::ostream& operator<< (std::ostream &out, const Matrix<T> &matrix){
     for (int i = 0; i < matrix.dimx; i++) {
         for (int j = 0; j < matrix.dimy; j++) {
-            out << matrix.m[i][j] << " ";
+            out << matrix.m[i][j] + 0 << " ";
         }
         out << std::endl;
     }
@@ -198,13 +198,16 @@ public:
     }
 
     void RowEchelonForm(){
-        this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
+        //this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
+        this->transpose();
+        this->DeleteZeroRows();
+        this->transpose();
 
         T temp = 0;
 
         for (int i = 0; i < dimx; i++) {
             for (int j = i; j < dimy; j++)
-                if (m[j][i] != 0) {
+                if (m[i][j] != 0) {
                     std::swap(m[i], m[j]);
                     break;
                 }
@@ -225,7 +228,11 @@ public:
     }
 
     void RowReducedEchelonForm(){
-        this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
+        this->transpose();
+        this->DeleteZeroRows();
+        this->transpose();
+
+        //this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
 
 
         T temp = 0;
@@ -294,7 +301,13 @@ public:
     }
 
     T det (){
+        this->transpose();
+        this->DeleteZeroRows();
+        this->transpose();
+
         if (dimx != dimy) throw "Non Square matrix! Can not compute the determinant.";
+
+
 
         mTemp = m;
 
@@ -336,6 +349,11 @@ public:
     void inverse(){
         vector<vector<T>> mnew;
 
+        this->transpose();
+        this->DeleteZeroRows();
+        this->transpose();
+
+        if (dimx != dimy) throw "Cannot Inverse non-square Matrix"; else
         if (this->det() == 0) throw "Cannot Inverse Matrix wirh Determinant = 0";
         mnew.resize(m.size());
         for (int i = 0; i < dimy; i++){

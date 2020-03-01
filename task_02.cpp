@@ -1,6 +1,12 @@
 #include "Matrix.hpp"
 
 int main(){
+    std::ifstream f1;
+    std::ofstream f2;
+
+    f1.open("in.txt");
+    f2.open("out.txt");
+
     Matrix<double> A;
 
     deque<int> abc;
@@ -9,7 +15,7 @@ int main(){
 
     int j =0;
 
-    std::cin >> A;
+    f1 >> A;
 
     int dimxAtStart = A.dimx;
 
@@ -20,7 +26,7 @@ int main(){
         A.ZeroesToPlus();
         A.DeleteZeroRows();
 
-        if (A.dimx == A.dimy && A.det() == 1) std::cout << 0 << " " << A.dimx;
+        if (A.dimx == A.dimy && A.det() == 1) f2 << 0 << " " << A.dimx;
         else{
             for (int i = 0; i < A.dimx; i++) {
                 j = 0;
@@ -42,7 +48,7 @@ int main(){
 
             for (int i = 0; i < A.dimx; i++) abc.pop_front();
 
-            std::cout << dimxAtStart-A.dimx << " " << A.dimy << std::endl;
+            f2 << dimxAtStart-A.dimx << " " << A.dimy << std::endl;
 
             for (int i = 0; i < dimxAtStart-A.dimx; i++){
                 for (int k = 0; k < A.dimy; k++){
@@ -57,20 +63,23 @@ int main(){
 
                     if (temp == 1){
 
-                        std::cout << -A.GetElement(k, abc[i]) + 0 << " ";
+                        f2 << -A.GetElement(k, abc[i]) + 0 << " ";
                     }
                     else{
-                        if (abc[i] == k) std::cout << "1 ";
-                        else std::cout << "0 ";
+                        if (abc[i] == k) f2 << "1 ";
+                        else f2 << "0 ";
                     }
 
                 }
-                std::cout << std::endl;
+                f2 << std::endl;
             }
         }
     }
 
     catch (const char* msg){
-        std::cout << -1 << std::endl << msg;
+        f2 << -1 << std::endl << msg;
     }
+
+    f1.close();
+    f2.close();
 }

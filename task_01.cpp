@@ -1,12 +1,18 @@
 #include "Matrix.hpp"
 
 int main(){
+    std::ifstream f1;
+    std::ofstream f2;
+
+    f1.open("in.txt");
+    f2.open("out.txt");
+
     double k;
     Matrix<double> A;
     Matrix<double> B;
     Matrix<double> C;
 
-    std::cin >> k >> A >> B >> C;
+    f1 >> k >> A >> B >> C;
 
     try{
         B.transpose();
@@ -14,9 +20,11 @@ int main(){
 
         A = A + k*B*C;
 
-        std::cout << 1 << std::endl << A.det() << std::endl << A;
+        f2 << 1 << std::endl << A.det() << std::endl << A;
     }
     catch (const char* msg){
-        std::cout << -1 << std::endl << msg;
+        f2 << -1 << std::endl << msg;
     }
-    }
+    f1.close();
+    f2.close();
+}
