@@ -4,9 +4,11 @@
 
 #include <iostream>
 #include <vector>
+#include <deque>
 #include "fstream"
 #include "assert.h"
 using std::vector;
+using std::deque;
 
 template <typename T>
 class Matrix;
@@ -196,6 +198,8 @@ public:
     }
 
     void RowEchelonForm(){
+        this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
+
         T temp = 0;
 
         for (int i = 0; i < dimx; i++) {
@@ -221,6 +225,9 @@ public:
     }
 
     void RowReducedEchelonForm(){
+        this->SetMatrixSize(std::max(dimx, dimy), std::max(dimx, dimy));
+
+
         T temp = 0;
         for (int i = 0; i < dimx; i++) {
             for (int j = i; j < dimy; j++)
@@ -375,7 +382,7 @@ public:
 
         m.resize(dimx);
 
-        for (int i = 0; i < dimx; i++) m[i].resize(dimy);
+        for (int i = 0; i < dimx; i++) m[i].resize(dimy, 0);
     }
 
     void ZeroesToPlus(){
